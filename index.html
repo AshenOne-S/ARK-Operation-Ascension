@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARK: Operation Ascension</title>
+<style>
+:root {
+  --bg:#050b10; --panel:#0b1821; --panel2:#102531; --panel3:#0d202a;
+  --text:#eef8fc; --muted:#8da8b7; --line:#1f4353;
+  --accent:#4ed8ff; --accent2:#7ef0b8; --warn:#ffd166; --danger:#ff7f7f;
+  --shadow:0 18px 45px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh;
+  background:
+    radial-gradient(circle at 85% 0%,rgba(78,216,255,.12),transparent 28%),
+    radial-gradient(circle at 0% 90%,rgba(126,240,184,.08),transparent 26%),
+    linear-gradient(180deg,#061018,#04090d);
+}
+button,input,select,textarea{font:inherit}
+.app{max-width:1380px;margin:auto;padding:18px}
+.hero{
+  border:1px solid var(--line);border-radius:24px;background:
+  linear-gradient(135deg,rgba(16,37,49,.97),rgba(7,16,22,.98));
+  box-shadow:var(--shadow);padding:24px;position:static;z-index:1;backdrop-filter:blur(14px)
+}
+.topline{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.title h1{margin:0;font-size:clamp(30px,5vw,52px);letter-spacing:.3px}
+.subtitle{color:var(--muted);margin-top:6px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.badge{padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);font-size:13px;color:#d3e6ef}
+.big-progress{margin-top:18px}
+.progress-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;font-weight:800}
+.bar{height:18px;border-radius:999px;overflow:hidden;background:#041016;border:1px solid var(--line)}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.25s}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:16px}
+.objective,.streak{
+  padding:14px 16px;border-radius:14px;border:1px solid rgba(78,216,255,.24);
+  background:rgba(78,216,255,.06)
+}
+.objective small,.streak small{display:block;color:var(--muted);margin-bottom:5px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+button{
+  color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  padding:10px 13px;cursor:pointer;font-weight:750
+}
+button:hover{border-color:var(--accent);transform:translateY(-1px)}
+button.primary{background:linear-gradient(135deg,#103d4f,#16495b)}
+button.warn:hover{border-color:var(--warn)}
+button.danger:hover{border-color:var(--danger);color:var(--danger)}
+.controls{display:grid;grid-template-columns:1fr 220px;gap:10px;margin-top:14px}
+input[type="search"],select,input[type="text"],input[type="number"],textarea{
+  width:100%;color:var(--text);background:#07141c;border:1px solid var(--line);
+  border-radius:11px;padding:11px 12px;outline:none
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+.stat{
+  background:linear-gradient(180deg,var(--panel),#09141b);border:1px solid var(--line);
+  border-radius:16px;padding:15px;box-shadow:var(--shadow)
+}
+.stat strong{font-size:26px;display:block;margin-bottom:4px}
+.stat span{color:var(--muted);font-size:13px}
+.layout{display:grid;grid-template-columns:310px 1fr;gap:16px}
+.sidebar{display:grid;gap:14px;align-content:start;position:sticky;top:310px;height:max-content}
+.panel{background:linear-gradient(180deg,var(--panel),#08141b);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.panel h3{margin:0 0 12px}
+.category-row{margin:10px 0}
+.category-head{display:flex;justify-content:space-between;color:#d8ecf5;font-size:13px;margin-bottom:5px}
+.mini-bar{height:9px;border-radius:999px;overflow:hidden;border:1px solid var(--line);background:#061117}
+.mini-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0}
+.quest{
+  padding:13px;border-radius:12px;background:rgba(126,240,184,.07);
+  border:1px solid rgba(126,240,184,.24);line-height:1.45
+}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+textarea{min-height:92px;resize:vertical}
+.content{display:grid;gap:14px}
+details{
+  background:linear-gradient(180deg,rgba(11,24,33,.98),rgba(7,16,22,.98));
+  border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)
+}
+summary{
+  list-style:none;cursor:pointer;padding:17px 18px;font-size:19px;font-weight:850;
+  display:flex;justify-content:space-between;align-items:center;gap:12px
+}
+summary::-webkit-details-marker{display:none}
+.sec-right{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.sec-dot{width:10px;height:10px;border-radius:50%;background:#244757}
+details.complete .sec-dot{background:var(--accent2);box-shadow:0 0 14px rgba(126,240,184,.55)}
+.section-body{padding:0 18px 18px}
+.group-title{margin:15px 0 8px;color:#dff7ff;font-size:15px}
+.task{
+  display:flex;gap:10px;align-items:flex-start;padding:10px 11px;margin:6px 0;
+  border-radius:11px;background:rgba(255,255,255,.025);border:1px solid transparent
+}
+.task:hover{background:rgba(255,255,255,.045);border-color:#173746}
+.task input{margin-top:3px;transform:scale(1.18);accent-color:var(--accent2)}
+.task label{cursor:pointer;line-height:1.35}
+.task.done label{text-decoration:line-through;color:#738d9a}
+.task.hidden{display:none}
+.hidden-section{display:none}
+.section-meter{height:6px;background:#061117;border-top:1px solid #14303d}
+.section-meter > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.notice{color:var(--muted);font-size:12px;line-height:1.5}
+.footer{text-align:center;color:var(--muted);padding:28px 0 12px;font-size:13px}
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;z-index:100;padding:16px
+}
+.modal.show{display:grid}
+.modal-card{width:min(680px,100%);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.modal-card h2{margin-top:0}
+.file-label{display:inline-block;padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);cursor:pointer;font-weight:700}
+.file-label input{display:none}
+
+
+
+.breeding-toolbar{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px}
+.breeding-list{display:grid;gap:16px}
+.breeding-card{
+  border:1px solid var(--line);border-radius:18px;padding:15px;
+  background:linear-gradient(180deg,rgba(16,37,49,.78),rgba(7,16,22,.9))
+}
+.breeding-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.breeding-card-head h4{margin:0;font-size:18px}
+.breeding-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.breeding-grid .wide{grid-column:span 2}
+.parent-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.parent-box{
+  border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.025)
+}
+.parent-box h5{margin:0 0 10px;font-size:15px}
+.advanced{
+  margin-top:10px;border:1px solid #173746;border-radius:12px;background:rgba(255,255,255,.02)
+}
+.advanced summary{padding:10px 12px;font-size:13px;font-weight:800}
+.advanced-body{padding:0 12px 12px}
+.stat-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.stat-table th,.stat-table td{padding:8px;border-bottom:1px solid #163744;text-align:left;vertical-align:middle}
+.stat-table input{padding:8px 9px;min-width:105px}
+.result-pill{
+  display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:850;
+  border:1px solid var(--line);white-space:nowrap
+}
+.from-mom{color:#ffb4d9;background:rgba(255,180,217,.08);border-color:rgba(255,180,217,.28)}
+.from-dad{color:#9cc8ff;background:rgba(156,200,255,.08);border-color:rgba(156,200,255,.28)}
+.from-both{color:#d8e7ef;background:rgba(216,231,239,.07)}
+.possible-mutation{color:var(--accent2);background:rgba(126,240,184,.09);border-color:rgba(126,240,184,.32)}
+.unknown-result{color:var(--muted)}
+.analysis-box{
+  margin-top:12px;padding:12px;border-radius:12px;background:rgba(78,216,255,.055);
+  border:1px solid rgba(78,216,255,.18);color:#d9f3fc;font-size:13px;line-height:1.55
+}
+.analysis-title{font-weight:900;margin-bottom:6px}
+.confirm-row{display:none;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.confirm-row.show{display:flex}
+.confirm-row select{max-width:230px}
+.bloodline-wrap{margin-top:18px}
+.bloodline-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.bloodline-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.generation-card{
+  border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.025)
+}
+.generation-card h5{margin:0 0 8px}
+.generation-card .notice{display:block;margin-top:5px}
+.best-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.best-stat{
+  border:1px solid rgba(126,240,184,.2);background:rgba(126,240,184,.055);
+  border-radius:11px;padding:9px
+}
+.best-stat strong{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.empty-note{color:var(--muted);font-size:13px;padding:12px 0}
+@media(max-width:900px){
+  .breeding-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .parent-grid{grid-template-columns:1fr}
+  .bloodline-grid{grid-template-columns:1fr 1fr}
+  .best-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .breeding-grid{grid-template-columns:1fr}
+  .breeding-grid .wide{grid-column:span 1}
+  .stat-table{font-size:12px;display:block;overflow-x:auto}
+  .bloodline-grid,.best-grid{grid-template-columns:1fr}
+}
+@media(max-width:1000px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:static;grid-template-columns:1fr 1fr}
+  .dashboard{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+  .app{padding:10px}
+  .hero{position:static;padding:18px}
+  .topline,.hero-grid{display:block}
+  .streak{margin-top:10px}
+  .controls{grid-template-columns:1fr}
+  .sidebar{grid-template-columns:1fr}
+  .dashboard{grid-template-columns:1fr 1fr}
+  summary{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <div class="topline">
+      <div class="title">
+        <h1>🏝 ARK: Operation Ascension</h1>
+        <div class="subtitle">The Island • Max wild level 150 • Original roadmap preserved</div>
+        <div class="badges">
+          <span class="badge">Island creatures only</span>
+          <span class="badge">No imported creatures</span>
+          <span class="badge">No commands</span>
+          <span class="badge">Thylacoleo = main mount</span>
+          <span class="badge">Argentavis = work mount</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="big-progress">
+      <div class="progress-head"><span>Overall campaign progress</span><span id="overallText">0%</span></div>
+      <div class="bar"><div class="fill" id="overallFill"></div></div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="objective">
+        <small>Current objective</small>
+        <strong id="currentObjective">Reach level 20</strong>
+      </div>
+      <div class="streak">
+        <small>Current milestone</small>
+        <strong id="currentMilestone">Milestone 1 — Survive</strong>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" onclick="openAll()">Open all</button>
+      <button onclick="closeAll()">Close all</button>
+      <button onclick="focusCurrent()">Focus current</button>
+      <button onclick="pickQuest()">🎲 Random side quest</button>
+      <button onclick="showSaveModal()">💾 Export / Import</button>
+      <button class="danger" onclick="resetProgress()">Reset</button>
+    </div>
+
+    <div class="controls">
+      <input id="searchBox" type="search" placeholder="Search tasks, milestones, caves, bosses...">
+      <select id="filterSelect">
+        <option value="all">Show all tasks</option>
+        <option value="open">Only incomplete</option>
+        <option value="done">Only completed</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="dashboard">
+    <div class="stat"><strong id="doneStat">0</strong><span>Tasks completed</span></div>
+    <div class="stat"><strong id="leftStat">0</strong><span>Tasks remaining</span></div>
+    <div class="stat"><strong id="milestoneStat">0/13</strong><span>Main milestones complete</span></div>
+    <div class="stat"><strong id="bossStat">0/9</strong><span>Boss fights complete</span></div>
+  </section>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <h3>Category progress</h3>
+        <div id="categoryProgress"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Today's side quest</h3>
+        <div class="quest" id="questBox">Press “Random side quest” when you want a change of pace.</div>
+      </section>
+
+      <section class="panel">
+        <h3>🐅 Thylacoleo profile</h3>
+        <div class="profile-grid">
+          <input type="text" data-save="thy-name" placeholder="Name">
+          <input type="number" data-save="thy-level" placeholder="Level">
+          <input type="text" data-save="thy-health" placeholder="Health">
+          <input type="text" data-save="thy-melee" placeholder="Melee">
+          <input type="text" data-save="thy-stamina" placeholder="Stamina">
+          <input type="text" data-save="thy-weight" placeholder="Weight">
+        </div>
+        <textarea data-save="thy-notes" placeholder="Colors, breeding goals, memorable fights..."></textarea>
+      </section>
+
+      <section class="panel">
+        <h3>🧬 Breeding Lab</h3>
+        <div class="notice">Store clean parent stats and compare babies for possible stat mutations.</div>
+        <button style="margin-top:10px" onclick="openBreedingLab()">Open Breeding Lab</button>
+      </section>
+
+      <section class="panel">
+        <h3>Save note</h3>
+        <div class="notice">Progress is saved automatically in this browser. Use Export Save to back it up or move it to another device.</div>
+      </section>
+    </aside>
+
+    <main class="content" id="content"></main>
+  </div>
+
+
+  <section class="panel" id="breedingLab" style="margin-top:16px">
+    <div class="breeding-card-head">
+      <div>
+        <h3 style="margin:0">🧬 Breeding Lab</h3>
+        <div class="notice">Enter both parents and the newborn baby. Press Analyze Baby to see where each stat came from, confirm suspected mutations, and add successful babies to the bloodline.</div>
+      </div>
+    </div>
+    <div class="breeding-toolbar">
+      <button class="primary" onclick="addBreedingRecord()">+ Add breeding record</button>
+      <button onclick="exportBreedingCSV()">Export breeding CSV</button>
+      <button class="danger" onclick="clearBreedingRecords()">Clear breeding records</button>
+    </div>
+    <div id="breedingList" class="breeding-list"></div>
+  </section>
+
+  <div class="footer">Built for Ash's first full Island ascension run.</div>
+</div>
+
+<div class="modal" id="saveModal">
+  <div class="modal-card">
+    <h2>Export or import progress</h2>
+    <p class="notice">Export downloads your checkboxes and Thylacoleo notes as a backup file. Import restores that file on another browser or device.</p>
+    <div class="actions">
+      <button class="primary" onclick="exportSave()">Download save backup</button>
+      <label class="file-label">Import save<input id="importFile" type="file" accept=".json,application/json"></label>
+      <button onclick="hideSaveModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SECTIONS=[{"id": "m1", "title": "🌱 Milestone 1 — Survive", "category": "Main Campaign", "groups": [["Become self-sufficient", ["Reach level 20", "Build a starter base", "Craft metal tools", "Unlock and craft a crossbow"]], ["First tames", ["Tame a Parasaur", "Tame a Trike", "Tame a Pteranodon"]], ["Explore", ["Visit Herbivore Island", "Visit Green Obelisk", "Collect 5 Explorer Notes"]]]}, {"id": "m2", "title": "🏡 Milestone 2 — Establish Your Home", "category": "Building", "groups": [["Main base", ["Build the main house", "Build a workshop", "Create an organized storage room", "Plan the forge and industrial area", "Build a hatchery / breeding room", "Build a trophy hall / artifact room", "Build a dock", "Reserve a stable for your future Thylacoleo"]], ["Utility tames", ["Tame a Doedicurus", "Tame a Castoroides"]]]}, {"id": "m3", "title": "🌾 Milestone 3 — Sustainability", "category": "Building", "groups": [["Greenhouse", ["Build a greenhouse", "Plant Rockarrot", "Plant Longrass", "Plant Citronal", "Plant Savoroot"]], ["Farming", ["Start a Dodo egg farm", "Tame an Oviraptor"]], ["Begin stockpiling", ["Build a reserve of hide and chitin", "Build a reserve of crystal and obsidian", "Build a reserve of cementing paste and silica pearls"]]]}, {"id": "m4", "title": "🦅 Milestone 4 — Industrial Age", "category": "Industry", "groups": [["Argentavis", ["Tame a level 135–150 Argentavis"]], ["Utility", ["Tame an Ankylosaurus", "Begin regular metal runs", "Begin regular crystal runs", "Begin regular obsidian runs"]], ["Industry", ["Build a Fabricator", "Set up a Generator", "Build the Industrial Forge", "Build the Industrial Cooker", "Build the Chemistry Bench"]]]}, {"id": "m5", "title": "🐅 Milestone 5 — The King's Hunt", "category": "Thylacoleo", "groups": [["Your companion", ["Find a level 135–150 Thylacoleo", "Tame it", "Name it", "Craft its saddle", "Finish its personal stable"]], ["First adventures", ["Kill an Alpha Raptor", "Kill an Alpha Carno", "Explore the entire Redwood biome", "Visit every Obelisk", "Climb every mountain"]]]}, {"id": "m6", "title": "🌍 Milestone 6 — Master the Island", "category": "Exploration", "groups": [["Outposts", ["Build a Volcano outpost", "Build a Snow outpost", "Build a Hidden Lake outpost", "Build an Ocean outpost"]], ["Explore", ["Explore Redwood", "Explore Volcano", "Explore Swamp", "Explore Snow", "Explore Carnivore Island"]], ["Major build", ["Complete at least one: Castle, Harbor, Lighthouse, Bridge, Redwood Treehouse, Hunter Lodge, or Dino Museum"]]]}, {"id": "m7", "title": "🕳 Milestone 7 — Cave Master", "category": "Caves", "groups": [["Caves", ["Lower South Cave", "Central Cave", "Upper South Cave", "Lava Cave", "Swamp Cave", "Snow Cave"]], ["Museum", ["Display every artifact in the museum"]]]}, {"id": "m8", "title": "🌊 Milestone 8 — The Ocean", "category": "Ocean", "groups": [["Ocean goals", ["Tame a Basilosaurus", "Explore the ocean coastline", "Explore an underwater cave", "Find deep-ocean loot drops", "Finish the Ocean dock / water pen"]]]}, {"id": "m9", "title": "🧬 Milestone 9 — Prepare the Army", "category": "Breeding", "groups": [["Utility breeding", ["Breed a strong Argentavis line", "Breed a strong Thylacoleo line"]], ["Boss army", ["Breed Rexes", "Breed a Yutyrannus", "Breed a Daedon"]], ["Supplies", ["Stockpile Medical Brews", "Acquire strong boss saddles", "Stockpile ammunition and armor sets"]]]}, {"id": "m10", "title": "🕷 Milestone 10 — Broodmother", "category": "Bosses", "groups": [["Boss", ["Defeat Gamma Broodmother", "Defeat Beta Broodmother", "Defeat Alpha Broodmother"]], ["Celebration", ["Expand the Trophy Hall"]]]}, {"id": "m11", "title": "🦍 Milestone 11 — Megapithecus", "category": "Bosses", "groups": [["Boss", ["Defeat Gamma Megapithecus", "Defeat Beta Megapithecus", "Defeat Alpha Megapithecus"]], ["Celebration", ["Build the Snow Fortress"]]]}, {"id": "m12", "title": "🐉 Milestone 12 — Dragon", "category": "Bosses", "groups": [["Preparation", ["Prepare the Dragon strategy and army"]], ["Boss", ["Defeat Gamma Dragon", "Defeat Beta Dragon", "Defeat Alpha Dragon"]], ["Celebration", ["Build the Volcano Fortress"]]]}, {"id": "m13", "title": "👑 Milestone 13 — Operation Ascension", "category": "Ascension", "groups": [["Before the Tek Cave", ["Every cave cleared", "Every required artifact collected", "Greenhouse and industrial area complete", "Museum and Trophy Hall complete", "Volcano, Snow, and Ocean outposts complete", "Perfect Thylacoleo ready for the final screenshot", "Tek Cave army and supplies ready"]], ["Finale", ["Enter the Tek Cave", "Defeat the Overseer", "Ascend"]]]}, {"id": "side", "title": "🎯 Side Quests & Boredom Breakers", "category": "Side Quests", "groups": [["Optional goals", ["Kill an Alpha Rex", "Kill an Alpha Megalodon", "Hunt or tame a Giganotosaurus", "Build a Lighthouse", "Build a Castle", "Build a Hunter Lodge", "Build a Redwood Treehouse", "Create a boss screenshot collection", "Take a final screenshot with your Thylacoleo before the Tek Cave", "Build a world you are proud to leave behind"]]]}];
+const TASKS=[{"id": "task-1", "section": "m1", "category": "Main Campaign", "group": "Become self-sufficient", "text": "Reach level 20"}, {"id": "task-2", "section": "m1", "category": "Main Campaign", "group": "Become self-sufficient", "text": "Build a starter base"}, {"id": "task-3", "section": "m1", "category": "Main Campaign", "group": "Become self-sufficient", "text": "Craft metal tools"}, {"id": "task-4", "section": "m1", "category": "Main Campaign", "group": "Become self-sufficient", "text": "Unlock and craft a crossbow"}, {"id": "task-5", "section": "m1", "category": "Main Campaign", "group": "First tames", "text": "Tame a Parasaur"}, {"id": "task-6", "section": "m1", "category": "Main Campaign", "group": "First tames", "text": "Tame a Trike"}, {"id": "task-7", "section": "m1", "category": "Main Campaign", "group": "First tames", "text": "Tame a Pteranodon"}, {"id": "task-8", "section": "m1", "category": "Main Campaign", "group": "Explore", "text": "Visit Herbivore Island"}, {"id": "task-9", "section": "m1", "category": "Main Campaign", "group": "Explore", "text": "Visit Green Obelisk"}, {"id": "task-10", "section": "m1", "category": "Main Campaign", "group": "Explore", "text": "Collect 5 Explorer Notes"}, {"id": "task-11", "section": "m2", "category": "Building", "group": "Main base", "text": "Build the main house"}, {"id": "task-12", "section": "m2", "category": "Building", "group": "Main base", "text": "Build a workshop"}, {"id": "task-13", "section": "m2", "category": "Building", "group": "Main base", "text": "Create an organized storage room"}, {"id": "task-14", "section": "m2", "category": "Building", "group": "Main base", "text": "Plan the forge and industrial area"}, {"id": "task-15", "section": "m2", "category": "Building", "group": "Main base", "text": "Build a hatchery / breeding room"}, {"id": "task-16", "section": "m2", "category": "Building", "group": "Main base", "text": "Build a trophy hall / artifact room"}, {"id": "task-17", "section": "m2", "category": "Building", "group": "Main base", "text": "Build a dock"}, {"id": "task-18", "section": "m2", "category": "Building", "group": "Main base", "text": "Reserve a stable for your future Thylacoleo"}, {"id": "task-19", "section": "m2", "category": "Building", "group": "Utility tames", "text": "Tame a Doedicurus"}, {"id": "task-20", "section": "m2", "category": "Building", "group": "Utility tames", "text": "Tame a Castoroides"}, {"id": "task-21", "section": "m3", "category": "Building", "group": "Greenhouse", "text": "Build a greenhouse"}, {"id": "task-22", "section": "m3", "category": "Building", "group": "Greenhouse", "text": "Plant Rockarrot"}, {"id": "task-23", "section": "m3", "category": "Building", "group": "Greenhouse", "text": "Plant Longrass"}, {"id": "task-24", "section": "m3", "category": "Building", "group": "Greenhouse", "text": "Plant Citronal"}, {"id": "task-25", "section": "m3", "category": "Building", "group": "Greenhouse", "text": "Plant Savoroot"}, {"id": "task-26", "section": "m3", "category": "Building", "group": "Farming", "text": "Start a Dodo egg farm"}, {"id": "task-27", "section": "m3", "category": "Building", "group": "Farming", "text": "Tame an Oviraptor"}, {"id": "task-28", "section": "m3", "category": "Building", "group": "Begin stockpiling", "text": "Build a reserve of hide and chitin"}, {"id": "task-29", "section": "m3", "category": "Building", "group": "Begin stockpiling", "text": "Build a reserve of crystal and obsidian"}, {"id": "task-30", "section": "m3", "category": "Building", "group": "Begin stockpiling", "text": "Build a reserve of cementing paste and silica pearls"}, {"id": "task-31", "section": "m4", "category": "Industry", "group": "Argentavis", "text": "Tame a level 135–150 Argentavis"}, {"id": "task-32", "section": "m4", "category": "Industry", "group": "Utility", "text": "Tame an Ankylosaurus"}, {"id": "task-33", "section": "m4", "category": "Industry", "group": "Utility", "text": "Begin regular metal runs"}, {"id": "task-34", "section": "m4", "category": "Industry", "group": "Utility", "text": "Begin regular crystal runs"}, {"id": "task-35", "section": "m4", "category": "Industry", "group": "Utility", "text": "Begin regular obsidian runs"}, {"id": "task-36", "section": "m4", "category": "Industry", "group": "Industry", "text": "Build a Fabricator"}, {"id": "task-37", "section": "m4", "category": "Industry", "group": "Industry", "text": "Set up a Generator"}, {"id": "task-38", "section": "m4", "category": "Industry", "group": "Industry", "text": "Build the Industrial Forge"}, {"id": "task-39", "section": "m4", "category": "Industry", "group": "Industry", "text": "Build the Industrial Cooker"}, {"id": "task-40", "section": "m4", "category": "Industry", "group": "Industry", "text": "Build the Chemistry Bench"}, {"id": "task-41", "section": "m5", "category": "Thylacoleo", "group": "Your companion", "text": "Find a level 135–150 Thylacoleo"}, {"id": "task-42", "section": "m5", "category": "Thylacoleo", "group": "Your companion", "text": "Tame it"}, {"id": "task-43", "section": "m5", "category": "Thylacoleo", "group": "Your companion", "text": "Name it"}, {"id": "task-44", "section": "m5", "category": "Thylacoleo", "group": "Your companion", "text": "Craft its saddle"}, {"id": "task-45", "section": "m5", "category": "Thylacoleo", "group": "Your companion", "text": "Finish its personal stable"}, {"id": "task-46", "section": "m5", "category": "Thylacoleo", "group": "First adventures", "text": "Kill an Alpha Raptor"}, {"id": "task-47", "section": "m5", "category": "Thylacoleo", "group": "First adventures", "text": "Kill an Alpha Carno"}, {"id": "task-48", "section": "m5", "category": "Thylacoleo", "group": "First adventures", "text": "Explore the entire Redwood biome"}, {"id": "task-49", "section": "m5", "category": "Thylacoleo", "group": "First adventures", "text": "Visit every Obelisk"}, {"id": "task-50", "section": "m5", "category": "Thylacoleo", "group": "First adventures", "text": "Climb every mountain"}, {"id": "task-51", "section": "m6", "category": "Exploration", "group": "Outposts", "text": "Build a Volcano outpost"}, {"id": "task-52", "section": "m6", "category": "Exploration", "group": "Outposts", "text": "Build a Snow outpost"}, {"id": "task-53", "section": "m6", "category": "Exploration", "group": "Outposts", "text": "Build a Hidden Lake outpost"}, {"id": "task-54", "section": "m6", "category": "Exploration", "group": "Outposts", "text": "Build an Ocean outpost"}, {"id": "task-55", "section": "m6", "category": "Exploration", "group": "Explore", "text": "Explore Redwood"}, {"id": "task-56", "section": "m6", "category": "Exploration", "group": "Explore", "text": "Explore Volcano"}, {"id": "task-57", "section": "m6", "category": "Exploration", "group": "Explore", "text": "Explore Swamp"}, {"id": "task-58", "section": "m6", "category": "Exploration", "group": "Explore", "text": "Explore Snow"}, {"id": "task-59", "section": "m6", "category": "Exploration", "group": "Explore", "text": "Explore Carnivore Island"}, {"id": "task-60", "section": "m6", "category": "Exploration", "group": "Major build", "text": "Complete at least one: Castle, Harbor, Lighthouse, Bridge, Redwood Treehouse, Hunter Lodge, or Dino Museum"}, {"id": "task-61", "section": "m7", "category": "Caves", "group": "Caves", "text": "Lower South Cave"}, {"id": "task-62", "section": "m7", "category": "Caves", "group": "Caves", "text": "Central Cave"}, {"id": "task-63", "section": "m7", "category": "Caves", "group": "Caves", "text": "Upper South Cave"}, {"id": "task-64", "section": "m7", "category": "Caves", "group": "Caves", "text": "Lava Cave"}, {"id": "task-65", "section": "m7", "category": "Caves", "group": "Caves", "text": "Swamp Cave"}, {"id": "task-66", "section": "m7", "category": "Caves", "group": "Caves", "text": "Snow Cave"}, {"id": "task-67", "section": "m7", "category": "Caves", "group": "Museum", "text": "Display every artifact in the museum"}, {"id": "task-68", "section": "m8", "category": "Ocean", "group": "Ocean goals", "text": "Tame a Basilosaurus"}, {"id": "task-69", "section": "m8", "category": "Ocean", "group": "Ocean goals", "text": "Explore the ocean coastline"}, {"id": "task-70", "section": "m8", "category": "Ocean", "group": "Ocean goals", "text": "Explore an underwater cave"}, {"id": "task-71", "section": "m8", "category": "Ocean", "group": "Ocean goals", "text": "Find deep-ocean loot drops"}, {"id": "task-72", "section": "m8", "category": "Ocean", "group": "Ocean goals", "text": "Finish the Ocean dock / water pen"}, {"id": "task-73", "section": "m9", "category": "Breeding", "group": "Utility breeding", "text": "Breed a strong Argentavis line"}, {"id": "task-74", "section": "m9", "category": "Breeding", "group": "Utility breeding", "text": "Breed a strong Thylacoleo line"}, {"id": "task-75", "section": "m9", "category": "Breeding", "group": "Boss army", "text": "Breed Rexes"}, {"id": "task-76", "section": "m9", "category": "Breeding", "group": "Boss army", "text": "Breed a Yutyrannus"}, {"id": "task-77", "section": "m9", "category": "Breeding", "group": "Boss army", "text": "Breed a Daedon"}, {"id": "task-78", "section": "m9", "category": "Breeding", "group": "Supplies", "text": "Stockpile Medical Brews"}, {"id": "task-79", "section": "m9", "category": "Breeding", "group": "Supplies", "text": "Acquire strong boss saddles"}, {"id": "task-80", "section": "m9", "category": "Breeding", "group": "Supplies", "text": "Stockpile ammunition and armor sets"}, {"id": "task-81", "section": "m10", "category": "Bosses", "group": "Boss", "text": "Defeat Gamma Broodmother"}, {"id": "task-82", "section": "m10", "category": "Bosses", "group": "Boss", "text": "Defeat Beta Broodmother"}, {"id": "task-83", "section": "m10", "category": "Bosses", "group": "Boss", "text": "Defeat Alpha Broodmother"}, {"id": "task-84", "section": "m10", "category": "Bosses", "group": "Celebration", "text": "Expand the Trophy Hall"}, {"id": "task-85", "section": "m11", "category": "Bosses", "group": "Boss", "text": "Defeat Gamma Megapithecus"}, {"id": "task-86", "section": "m11", "category": "Bosses", "group": "Boss", "text": "Defeat Beta Megapithecus"}, {"id": "task-87", "section": "m11", "category": "Bosses", "group": "Boss", "text": "Defeat Alpha Megapithecus"}, {"id": "task-88", "section": "m11", "category": "Bosses", "group": "Celebration", "text": "Build the Snow Fortress"}, {"id": "task-89", "section": "m12", "category": "Bosses", "group": "Preparation", "text": "Prepare the Dragon strategy and army"}, {"id": "task-90", "section": "m12", "category": "Bosses", "group": "Boss", "text": "Defeat Gamma Dragon"}, {"id": "task-91", "section": "m12", "category": "Bosses", "group": "Boss", "text": "Defeat Beta Dragon"}, {"id": "task-92", "section": "m12", "category": "Bosses", "group": "Boss", "text": "Defeat Alpha Dragon"}, {"id": "task-93", "section": "m12", "category": "Bosses", "group": "Celebration", "text": "Build the Volcano Fortress"}, {"id": "task-94", "section": "m13", "category": "Ascension", "group": "Before the Tek Cave", "text": "Every cave cleared"}, {"id": "task-95", "section": "m13", "category": "Ascension", "group": "Before the Tek Cave", "text": "Every required artifact collected"}, {"id": "task-96", "section": "m13", "category": "Ascension", "group": "Before the Tek Cave", "text": "Greenhouse and industrial area complete"}, {"id": "task-97", "section": "m13", "category": "Ascension", "group": "Before the Tek Cave", "text": "Museum and Trophy Hall complete"}, {"id": "task-98", "section": "m13", "category": "Ascension", "group": "Before the Tek Cave", "text": "Volcano, Snow, and Ocean outposts complete"}, {"id": "task-99", "section": "m13", "category": "Ascension", "group": "Before the Tek Cave", "text": "Perfect Thylacoleo ready for the final screenshot"}, {"id": "task-100", "section": "m13", "category": "Ascension", "group": "Before the Tek Cave", "text": "Tek Cave army and supplies ready"}, {"id": "task-101", "section": "m13", "category": "Ascension", "group": "Finale", "text": "Enter the Tek Cave"}, {"id": "task-102", "section": "m13", "category": "Ascension", "group": "Finale", "text": "Defeat the Overseer"}, {"id": "task-103", "section": "m13", "category": "Ascension", "group": "Finale", "text": "Ascend"}, {"id": "task-104", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Kill an Alpha Rex"}, {"id": "task-105", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Kill an Alpha Megalodon"}, {"id": "task-106", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Hunt or tame a Giganotosaurus"}, {"id": "task-107", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Build a Lighthouse"}, {"id": "task-108", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Build a Castle"}, {"id": "task-109", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Build a Hunter Lodge"}, {"id": "task-110", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Build a Redwood Treehouse"}, {"id": "task-111", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Create a boss screenshot collection"}, {"id": "task-112", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Take a final screenshot with your Thylacoleo before the Tek Cave"}, {"id": "task-113", "section": "side", "category": "Side Quests", "group": "Optional goals", "text": "Build a world you are proud to leave behind"}];
+const STORAGE_KEY="ark-operation-ascension-v2";
+const QUESTS=[
+  "Hunt an Alpha creature.",
+  "Improve one room in your base.",
+  "Build something purely for looks.",
+  "Complete a metal, crystal, or obsidian run.",
+  "Explore somewhere you normally fly over.",
+  "Search for a better Thylacoleo.",
+  "Search for any level 150 creature.",
+  "Run one cave for loot.",
+  "Collect Explorer Notes.",
+  "Go on an ocean expedition.",
+  "Organize your storage and breeding lines.",
+  "Take screenshots of your favorite tame and base.",
+  "Scout a future outpost location.",
+  "Complete one unfinished building project.",
+  "Go supply-drop hunting.",
+  "Take the Thylacoleo instead of flying.",
+  "Decorate the Trophy Hall.",
+  "Upgrade one outpost.",
+  "Breed one better stat into a favorite tame."
+];
+
+let state={checks:{},fields:{},open:{},quest:"",breeding:[]};
+
+function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+function render(){
+  const root=document.getElementById("content");
+  root.innerHTML="";
+  SECTIONS.forEach((sec,si)=>{
+    const details=document.createElement("details");
+    details.dataset.section=sec.id;
+    if(si===0)details.open=true;
+
+    const summary=document.createElement("summary");
+    summary.innerHTML=`<span>${esc(sec.title)}</span><span class="sec-right"><span class="section-count">0/0</span><span class="sec-dot"></span></span>`;
+    details.appendChild(summary);
+
+    const body=document.createElement("div");
+    body.className="section-body";
+
+    sec.groups.forEach(([group,tasks])=>{
+      const h=document.createElement("div");
+      h.className="group-title";
+      h.textContent=group;
+      body.appendChild(h);
+
+      tasks.forEach(taskText=>{
+        const meta=TASKS.find(t=>t.section===sec.id&&t.text===taskText);
+        const row=document.createElement("div");
+        row.className="task";
+        row.dataset.text=(sec.title+" "+group+" "+taskText+" "+sec.category).toLowerCase();
+        row.dataset.category=sec.category;
+        row.innerHTML=`<input type="checkbox" id="${meta.id}"><label for="${meta.id}">${esc(taskText)}</label>`;
+        body.appendChild(row);
+      });
+    });
+
+    details.appendChild(body);
+    const meter=document.createElement("div");
+    meter.className="section-meter";
+    meter.innerHTML="<div></div>";
+    details.appendChild(meter);
+    root.appendChild(details);
+  });
+
+  bindEvents();
+}
+
+function bindEvents(){
+  document.querySelectorAll('input[type="checkbox"]').forEach(c=>c.addEventListener("change",()=>{
+    state.checks[c.id]=c.checked; updateAll(); save();
+  }));
+  document.querySelectorAll("[data-save]").forEach(f=>f.addEventListener("input",()=>{
+    state.fields[f.dataset.save]=f.value; save();
+  }));
+  document.querySelectorAll("details").forEach(d=>d.addEventListener("toggle",()=>{
+    state.open[d.dataset.section]=d.open; save();
+  }));
+  document.getElementById("searchBox").addEventListener("input",applyFilters);
+  document.getElementById("filterSelect").addEventListener("change",applyFilters);
+  document.getElementById("importFile").addEventListener("change",importSave);
+}
+
+function load(){
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(raw){try{state=JSON.parse(raw)}catch(e){}}
+  document.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=!!state.checks[c.id]);
+  document.querySelectorAll("[data-save]").forEach(f=>f.value=state.fields[f.dataset.save]??"");
+  document.querySelectorAll("details").forEach(d=>{
+    if(state.open&&d.dataset.section in state.open)d.open=!!state.open[d.dataset.section];
+  });
+  if(!Array.isArray(state.breeding))state.breeding=[];
+  if(state.quest)document.getElementById("questBox").textContent=state.quest;
+  renderBreeding();
+}
+
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+
+function updateAll(){
+  const checks=[...document.querySelectorAll('input[type="checkbox"]')];
+  checks.forEach(c=>c.closest(".task").classList.toggle("done",c.checked));
+  const done=checks.filter(c=>c.checked).length,total=checks.length,pct=Math.round(done/total*100);
+  document.getElementById("overallFill").style.width=pct+"%";
+  document.getElementById("overallText").textContent=pct+"%";
+  document.getElementById("doneStat").textContent=done;
+  document.getElementById("leftStat").textContent=total-done;
+
+  let completedMain=0;
+  document.querySelectorAll("details").forEach(d=>{
+    const sc=[...d.querySelectorAll('input[type="checkbox"]')];
+    const sd=sc.filter(c=>c.checked).length;
+    d.querySelector(".section-count").textContent=`${sd}/${sc.length}`;
+    d.querySelector(".section-meter>div").style.width=(sc.length?sd/sc.length*100:0)+"%";
+    d.classList.toggle("complete",sc.length>0&&sd===sc.length);
+    if(d.dataset.section!=="side"&&sd===sc.length)completedMain++;
+  });
+  document.getElementById("milestoneStat").textContent=completedMain+"/13";
+
+  const bossTasks=TASKS.filter(t=>/Defeat (Gamma|Beta|Alpha) (Broodmother|Megapithecus|Dragon)/.test(t.text));
+  const bossDone=bossTasks.filter(t=>state.checks[t.id]).length;
+  document.getElementById("bossStat").textContent=bossDone+"/9";
+
+  const nextMeta=TASKS.find(t=>!state.checks[t.id]&&t.section!=="side") || TASKS.find(t=>!state.checks[t.id]);
+  document.getElementById("currentObjective").textContent=nextMeta?nextMeta.text:"Campaign complete. You ascended.";
+  if(nextMeta){
+    const sec=SECTIONS.find(s=>s.id===nextMeta.section);
+    document.getElementById("currentMilestone").textContent=sec?sec.title.replace(/^[^ ]+ /,""):"Side Quests";
+  }else{
+    document.getElementById("currentMilestone").textContent="Ascended Survivor";
+  }
+
+  renderCategoryProgress();
+  applyFilters();
+}
+
+function renderCategoryProgress(){
+  const cats=[...new Set(TASKS.map(t=>t.category))];
+  const root=document.getElementById("categoryProgress");
+  root.innerHTML="";
+  cats.forEach(cat=>{
+    const ts=TASKS.filter(t=>t.category===cat),d=ts.filter(t=>state.checks[t.id]).length;
+    const pct=Math.round(d/ts.length*100);
+    root.innerHTML+=`<div class="category-row"><div class="category-head"><span>${esc(cat)}</span><span>${d}/${ts.length}</span></div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div></div>`;
+  });
+}
+
+function applyFilters(){
+  const q=document.getElementById("searchBox").value.trim().toLowerCase();
+  const mode=document.getElementById("filterSelect").value;
+  document.querySelectorAll("details").forEach(d=>{
+    let visible=0;
+    d.querySelectorAll(".task").forEach(row=>{
+      const c=row.querySelector('input[type="checkbox"]');
+      const matchText=!q||row.dataset.text.includes(q);
+      const matchMode=mode==="all"||(mode==="open"&&!c.checked)||(mode==="done"&&c.checked);
+      const show=matchText&&matchMode;
+      row.classList.toggle("hidden",!show);
+      if(show)visible++;
+    });
+    d.classList.toggle("hidden-section",visible===0);
+    if(q&&visible>0)d.open=true;
+  });
+}
+
+function openAll(){document.querySelectorAll("details").forEach(d=>d.open=true)}
+function closeAll(){document.querySelectorAll("details").forEach(d=>d.open=false)}
+function focusCurrent(){
+  const next=TASKS.find(t=>!state.checks[t.id]&&t.section!=="side")||TASKS.find(t=>!state.checks[t.id]);
+  if(!next)return;
+  document.getElementById("searchBox").value="";
+  document.getElementById("filterSelect").value="all";
+  applyFilters();
+  const checkbox=document.getElementById(next.id);
+  const d=checkbox.closest("details");
+  d.open=true;
+  setTimeout(()=>checkbox.closest(".task").scrollIntoView({behavior:"smooth",block:"center"}),100);
+}
+function pickQuest(){
+  const q=QUESTS[Math.floor(Math.random()*QUESTS.length)];
+  state.quest=q;document.getElementById("questBox").textContent=q;save();
+}
+function resetProgress(){
+  if(confirm("Reset every checkbox, note, and saved profile?")){
+    state={checks:{},fields:{},open:{},quest:"",breeding:[]};
+    save();location.reload();
+  }
+}
+function showSaveModal(){document.getElementById("saveModal").classList.add("show")}
+function hideSaveModal(){document.getElementById("saveModal").classList.remove("show")}
+function exportSave(){
+  save();
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="ARK_Operation_Ascension_Save.json";
+  a.click();URL.revokeObjectURL(a.href);
+}
+function importSave(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const imported=JSON.parse(reader.result);
+      if(!imported.checks||!imported.fields)throw new Error();
+      state=imported;save();location.reload();
+    }catch(err){alert("That file is not a valid Operation Ascension save.")}
+  };
+  reader.readAsText(file);
+}
+
+
+
+
+const BREED_STATS=[
+  ["health","Health"],["stamina","Stamina"],["oxygen","Oxygen"],["food","Food"],
+  ["weight","Weight"],["melee","Melee"],["movement","Movement Speed"]
+];
+
+function blankStats(){
+  const stats={};
+  BREED_STATS.forEach(([k])=>stats[k]="");
+  return stats;
+}
+function blankCounters(){
+  return {maternal:"0",paternal:"0"};
+}
+function newBreedingRecord(){
+  return {
+    id:"breed-"+Date.now()+"-"+Math.random().toString(16).slice(2),
+    species:"",lineName:"",
+    mother:{name:"",level:"",stats:blankStats(),counters:blankCounters()},
+    father:{name:"",level:"",stats:blankStats(),counters:blankCounters()},
+    baby:{name:"",level:"",stats:blankStats(),counters:blankCounters()},
+    tolerance:"0.01",
+    analyzed:false,
+    mutationConfirmation:"",
+    notes:"",
+    bloodline:[]
+  };
+}
+function normalizeBreedingRecord(r){
+  if(!r.mother||!r.father||!r.baby){
+    const n=newBreedingRecord();
+    n.id=r.id||n.id;n.species=r.species||"";n.lineName=r.lineName||"";n.notes=r.notes||"";
+    r=n;
+  }
+  ["mother","father","baby"].forEach(p=>{
+    if(!r[p])r[p]={name:"",level:"",stats:blankStats(),counters:blankCounters()};
+    if(!r[p].stats)r[p].stats=blankStats();
+    if(!r[p].counters){
+      r[p].counters={
+        maternal:r[p].maternal||"0",
+        paternal:r[p].paternal||"0"
+      };
+    }
+    BREED_STATS.forEach(([k])=>{if(!(k in r[p].stats))r[p].stats[k]=""});
+  });
+  if(r.tolerance===undefined)r.tolerance="0.01";
+  if(!Array.isArray(r.bloodline))r.bloodline=[];
+  if(r.analyzed===undefined)r.analyzed=false;
+  if(r.mutationConfirmation===undefined)r.mutationConfirmation="";
+  return r;
+}
+function openBreedingLab(){
+  document.getElementById("breedingLab").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function addBreedingRecord(){
+  if(!Array.isArray(state.breeding))state.breeding=[];
+  state.breeding.push(newBreedingRecord());
+  save();renderBreeding();
+  setTimeout(()=>document.getElementById("breedingList").lastElementChild?.scrollIntoView({behavior:"smooth",block:"center"}),50);
+}
+function deleteBreedingRecord(id){
+  if(!confirm("Delete this breeding record and its bloodline history?"))return;
+  state.breeding=state.breeding.filter(r=>r.id!==id);
+  save();renderBreeding();
+}
+function clearBreedingRecords(){
+  if(!confirm("Delete every breeding record and bloodline?"))return;
+  state.breeding=[];save();renderBreeding();
+}
+function setNested(obj,path,value){
+  const parts=path.split(".");
+  let ref=obj;
+  for(let i=0;i<parts.length-1;i++){
+    if(!ref[parts[i]])ref[parts[i]]={};
+    ref=ref[parts[i]];
+  }
+  ref[parts.at(-1)]=value;
+}
+function updateBreedField(id,path,value,rerender=false){
+  const r=state.breeding.find(x=>x.id===id);if(!r)return;
+  normalizeBreedingRecord(r);
+  setNested(r,path,value);
+  r.analyzed=false;
+  r.mutationConfirmation="";
+  save();
+  if(rerender)renderBreeding();
+}
+function num(v){
+  const n=parseFloat(String(v??"").replace(/[^0-9.\-]/g,""));
+  return Number.isFinite(n)?n:null;
+}
+function closeEnough(a,b,tol){
+  return Math.abs(a-b)<=tol;
+}
+function classifyInheritance(momVal,dadVal,babyVal,tolerance){
+  const m=num(momVal),d=num(dadVal),b=num(babyVal),tol=Math.max(0,num(tolerance)??0.01);
+  if(m===null||d===null||b===null)return {key:"unknown",label:"Missing value",detail:""};
+  const momMatch=closeEnough(b,m,tol);
+  const dadMatch=closeEnough(b,d,tol);
+  if(momMatch&&dadMatch)return {key:"both",label:"Matches both parents",detail:""};
+  if(momMatch)return {key:"mom",label:"Inherited from Mother",detail:""};
+  if(dadMatch)return {key:"dad",label:"Inherited from Father",detail:""};
+  const highest=Math.max(m,d);
+  if(b>highest+tol){
+    return {
+      key:"mutation",
+      label:"Possible mutation",
+      detail:`Baby is ${(b-highest).toFixed(Math.abs(b-highest)<1?2:1).replace(/\.0$/,"")} above the higher parent`
+    };
+  }
+  return {key:"neither",label:"Matches neither parent",detail:"Check rounding, imprinting, leveling, or entry"};
+}
+function pillClass(key){
+  return {
+    mom:"from-mom",dad:"from-dad",both:"from-both",mutation:"possible-mutation",
+    neither:"unknown-result",unknown:"unknown-result"
+  }[key]||"unknown-result";
+}
+function analyzeBaby(id){
+  const r=state.breeding.find(x=>x.id===id);if(!r)return;
+  normalizeBreedingRecord(r);
+  r.analyzed=true;
+  save();renderBreeding();
+}
+function getAnalysis(r){
+  const mutationCandidates=[],mom=[],dad=[],both=[],unclear=[],missing=[];
+  BREED_STATS.forEach(([k,label])=>{
+    const result=classifyInheritance(r.mother.stats[k],r.father.stats[k],r.baby.stats[k],r.tolerance);
+    if(result.key==="mutation")mutationCandidates.push(label);
+    else if(result.key==="mom")mom.push(label);
+    else if(result.key==="dad")dad.push(label);
+    else if(result.key==="both")both.push(label);
+    else if(result.key==="unknown")missing.push(label);
+    else unclear.push(label);
+  });
+  return {mutationCandidates,mom,dad,both,unclear,missing};
+}
+function counterTotal(p){
+  return (parseInt(p.counters?.maternal)||0)+(parseInt(p.counters?.paternal)||0);
+}
+function confirmMutation(id,value){
+  const r=state.breeding.find(x=>x.id===id);if(!r)return;
+  r.mutationConfirmation=value;save();renderBreeding();
+}
+function analysisHTML(r){
+  const a=getAnalysis(r);
+  const babyCount=counterTotal(r.baby);
+  const momCount=counterTotal(r.mother);
+  const dadCount=counterTotal(r.father);
+  const highestParent=Math.max(momCount,dadCount);
+  const counterIncreased=babyCount>highestParent;
+
+  let verdict="No mutation detected from the entered stats.";
+  if(a.missing.length)verdict="Complete the missing stats before trusting the result.";
+  else if(a.mutationCandidates.length){
+    if(r.mutationConfirmation==="yes"||counterIncreased){
+      verdict=`Confirmed or strongly supported mutation in: ${a.mutationCandidates.join(", ")}.`;
+    }else if(r.mutationConfirmation==="no"){
+      verdict=`The stat increase was not confirmed by the mutation counter. Recheck rounding, imprinting, or entered values.`;
+    }else{
+      verdict=`Possible mutation in: ${a.mutationCandidates.join(", ")}. Check the baby's mutation counter to confirm.`;
+    }
+  }
+
+  return `
+    <div class="analysis-title">${verdict}</div>
+    <strong>From Mother:</strong> ${a.mom.length?a.mom.join(", "):"None"}<br>
+    <strong>From Father:</strong> ${a.dad.length?a.dad.join(", "):"None"}<br>
+    <strong>Same on both parents:</strong> ${a.both.length?a.both.join(", "):"None"}<br>
+    ${a.unclear.length?`<strong>Needs checking:</strong> ${a.unclear.join(", ")}<br>`:""}
+    <strong>Mutation counters:</strong> Mother ${momCount}, Father ${dadCount}, Baby ${babyCount}
+    <div class="confirm-row ${a.mutationCandidates.length?"show":""}">
+      <span>Did the baby's mutation counter increase?</span>
+      <select onchange="confirmMutation('${r.id}',this.value)">
+        <option value="" ${!r.mutationConfirmation?"selected":""}>Not checked yet</option>
+        <option value="yes" ${r.mutationConfirmation==="yes"?"selected":""}>Yes — confirm mutation</option>
+        <option value="no" ${r.mutationConfirmation==="no"?"selected":""}>No — not confirmed</option>
+      </select>
+    </div>
+    <span class="notice">Use a freshly born, unlevelled, unimprinted baby. Small displayed-stat rounding differences are handled by the tolerance setting.</span>`;
+}
+function personBox(r,id,key,title){
+  const p=r[key];
+  return `<div class="parent-box">
+    <h5>${title}</h5>
+    <div class="breeding-grid">
+      <input class="wide" type="text" value="${esc(p.name||"")}" placeholder="${title} name" oninput="updateBreedField('${id}','${key}.name',this.value)">
+      <input type="number" value="${esc(String(p.level||""))}" placeholder="Level" oninput="updateBreedField('${id}','${key}.level',this.value)">
+    </div>
+    <details class="advanced">
+      <summary>Advanced mutation counters</summary>
+      <div class="advanced-body breeding-grid">
+        <input type="number" min="0" value="${esc(String(p.counters?.maternal||"0"))}" placeholder="Maternal" oninput="updateBreedField('${id}','${key}.counters.maternal',this.value)">
+        <input type="number" min="0" value="${esc(String(p.counters?.paternal||"0"))}" placeholder="Paternal" oninput="updateBreedField('${id}','${key}.counters.paternal',this.value)">
+      </div>
+    </details>
+  </div>`;
+}
+function addBabyToBloodline(id){
+  const r=state.breeding.find(x=>x.id===id);if(!r)return;
+  normalizeBreedingRecord(r);
+  if(!r.baby.name){
+    alert("Give the baby a name before adding it to the bloodline.");
+    return;
+  }
+  const a=getAnalysis(r);
+  const generation={
+    id:"gen-"+Date.now(),
+    number:r.bloodline.length+1,
+    name:r.baby.name,
+    level:r.baby.level,
+    stats:JSON.parse(JSON.stringify(r.baby.stats)),
+    counters:JSON.parse(JSON.stringify(r.baby.counters)),
+    mutations:a.mutationCandidates.slice(),
+    confirmed:r.mutationConfirmation==="yes"||counterTotal(r.baby)>Math.max(counterTotal(r.mother),counterTotal(r.father)),
+    notes:r.notes||""
+  };
+  r.bloodline.push(generation);
+  save();renderBreeding();
+}
+function deleteGeneration(recordId,genId){
+  const r=state.breeding.find(x=>x.id===recordId);if(!r)return;
+  r.bloodline=r.bloodline.filter(g=>g.id!==genId);
+  save();renderBreeding();
+}
+function bestStatsHTML(r){
+  const best={};
+  BREED_STATS.forEach(([k,label])=>{
+    let winner=null;
+    r.bloodline.forEach(g=>{
+      const value=num(g.stats?.[k]);
+      if(value===null)return;
+      if(!winner||value>winner.value)winner={value,name:g.name,number:g.number};
+    });
+    best[k]={label,winner};
+  });
+  return `<div class="best-grid">${
+    Object.values(best).map(({label,winner})=>`
+      <div class="best-stat">
+        <strong>${label}</strong>
+        ${winner?`${winner.value}<div class="notice">${esc(winner.name)} • Gen ${winner.number}</div>`:"No data"}
+      </div>`).join("")
+  }</div>`;
+}
+function bloodlineHTML(r){
+  if(!r.bloodline.length){
+    return `<div class="empty-note">No generations saved yet. Analyze a baby, then add it to the bloodline.</div>`;
+  }
+  return `
+    <div class="bloodline-grid">
+      ${r.bloodline.map(g=>`
+        <div class="generation-card">
+          <h5>Generation ${g.number} — ${esc(g.name)}</h5>
+          <div>Level: ${esc(String(g.level||"—"))}</div>
+          <div>Mutation counter: ${counterTotal({counters:g.counters})}</div>
+          <div>Mutation: ${g.mutations?.length?esc(g.mutations.join(", ")):"None detected"}</div>
+          <span class="notice">${g.confirmed?"Mutation confirmed/supported":"Mutation not confirmed"}</span>
+          <button class="danger" style="margin-top:9px;padding:6px 8px" onclick="deleteGeneration('${r.id}','${g.id}')">Remove</button>
+        </div>`).join("")}
+    </div>
+    <h5 style="margin:14px 0 6px">Current best stats in this bloodline</h5>
+    ${bestStatsHTML(r)}
+  `;
+}
+function renderBreeding(){
+  const root=document.getElementById("breedingList");if(!root)return;
+  if(!Array.isArray(state.breeding))state.breeding=[];
+  state.breeding=state.breeding.map(normalizeBreedingRecord);
+
+  if(state.breeding.length===0){
+    root.innerHTML='<div class="empty-note">No breeding records yet. Add one, enter the mother, father, and newborn baby, then press Analyze Baby.</div>';
+    return;
+  }
+
+  root.innerHTML=state.breeding.map(r=>{
+    const rows=BREED_STATS.map(([k,label])=>{
+      const result=r.analyzed
+        ? classifyInheritance(r.mother.stats[k],r.father.stats[k],r.baby.stats[k],r.tolerance)
+        : {key:"unknown",label:"Not analyzed",detail:""};
+
+      return `<tr>
+        <td><strong>${label}</strong></td>
+        <td><input type="text" value="${esc(r.mother.stats[k]||"")}" placeholder="Mother" oninput="updateBreedField('${r.id}','mother.stats.${k}',this.value)"></td>
+        <td><input type="text" value="${esc(r.father.stats[k]||"")}" placeholder="Father" oninput="updateBreedField('${r.id}','father.stats.${k}',this.value)"></td>
+        <td><input type="text" value="${esc(r.baby.stats[k]||"")}" placeholder="Baby" oninput="updateBreedField('${r.id}','baby.stats.${k}',this.value)"></td>
+        <td>
+          <span class="result-pill ${pillClass(result.key)}">${result.label}</span>
+          ${result.detail?`<div class="notice" style="margin-top:5px">${result.detail}</div>`:""}
+        </td>
+      </tr>`;
+    }).join("");
+
+    return `<article class="breeding-card">
+      <div class="breeding-card-head">
+        <h4>${esc(r.species||"New breeding comparison")} ${r.lineName?`— ${esc(r.lineName)}`:""}</h4>
+        <button class="danger" style="padding:7px 9px" onclick="deleteBreedingRecord('${r.id}')">Delete</button>
+      </div>
+
+      <div class="breeding-grid">
+        <input class="wide" type="text" value="${esc(r.species||"")}" placeholder="Species (e.g. Thylacoleo)" oninput="updateBreedField('${r.id}','species',this.value,true)">
+        <input class="wide" type="text" value="${esc(r.lineName||"")}" placeholder="Bloodline name (e.g. Health line)" oninput="updateBreedField('${r.id}','lineName',this.value)">
+      </div>
+
+      <div class="parent-grid">
+        ${personBox(r,r.id,"mother","♀ Mother")}
+        ${personBox(r,r.id,"father","♂ Father")}
+      </div>
+
+      <div class="parent-box" style="margin-top:12px">
+        <h5>🍼 Baby</h5>
+        <div class="breeding-grid">
+          <input class="wide" type="text" value="${esc(r.baby.name||"")}" placeholder="Baby name" oninput="updateBreedField('${r.id}','baby.name',this.value)">
+          <input type="number" value="${esc(String(r.baby.level||""))}" placeholder="Baby level" oninput="updateBreedField('${r.id}','baby.level',this.value)">
+        </div>
+        <details class="advanced">
+          <summary>Advanced mutation counters</summary>
+          <div class="advanced-body breeding-grid">
+            <input type="number" min="0" value="${esc(String(r.baby.counters?.maternal||"0"))}" placeholder="Maternal" oninput="updateBreedField('${r.id}','baby.counters.maternal',this.value)">
+            <input type="number" min="0" value="${esc(String(r.baby.counters?.paternal||"0"))}" placeholder="Paternal" oninput="updateBreedField('${r.id}','baby.counters.paternal',this.value)">
+            <input type="number" step="0.001" min="0" value="${esc(String(r.tolerance||"0.01"))}" placeholder="Tolerance" title="Small rounding tolerance" oninput="updateBreedField('${r.id}','tolerance',this.value)">
+          </div>
+        </details>
+      </div>
+
+      <table class="stat-table">
+        <thead><tr><th>Stat</th><th>Mother</th><th>Father</th><th>Baby</th><th>Result</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div class="actions" style="margin-top:12px">
+        <button class="primary" onclick="analyzeBaby('${r.id}')">Analyze Baby</button>
+        ${r.analyzed?`<button onclick="addBabyToBloodline('${r.id}')">Add Baby to Bloodline</button>`:""}
+      </div>
+
+      ${r.analyzed?`<div class="analysis-box">${analysisHTML(r)}</div>`:""}
+
+      <textarea style="margin-top:10px" placeholder="Breeding notes, colors, parent IDs, generation..." oninput="updateBreedField('${r.id}','notes',this.value)">${esc(r.notes||"")}</textarea>
+
+      <div class="bloodline-wrap">
+        <div class="bloodline-header">
+          <h4 style="margin:0">Bloodline History</h4>
+          <span class="notice">${r.bloodline.length} generation${r.bloodline.length===1?"":"s"} saved</span>
+        </div>
+        ${bloodlineHTML(r)}
+      </div>
+    </article>`;
+  }).join("");
+
+  save();
+}
+function exportBreedingCSV(){
+  if(!state.breeding?.length){alert("Add at least one breeding record first.");return}
+  const headers=["Species","Bloodline","Generation","Baby","Level","Mutation Confirmed","Mutation Stats",...BREED_STATS.map(x=>x[1]),"Notes"];
+  const rows=[];
+  state.breeding.forEach(r=>{
+    r.bloodline.forEach(g=>{
+      rows.push([
+        r.species,r.lineName,g.number,g.name,g.level,g.confirmed?"Yes":"No",
+        g.mutations?.join(" | ")||"",
+        ...BREED_STATS.map(([k])=>g.stats?.[k]||""),
+        g.notes||""
+      ]);
+    });
+  });
+  if(!rows.length){alert("Add at least one baby to a bloodline first.");return}
+  const csv=[headers,...rows].map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="ARK_Bloodline_History.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+render();load();updateAll();
+</script>
+</body>
+</html>
